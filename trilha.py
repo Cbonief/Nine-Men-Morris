@@ -90,10 +90,10 @@ class Trilha:
         elif jogada.tipo == 'RemoverPeca' and self.etapa == 2:
             self.remover_peca(jogada.posicao)
             if self.numero_de_pecas_branco == 2:
-                self.vencedor = 1
+                self.vencedor = -1
                 self.game_over = True
             if self.numero_de_pecas_preto == 2:
-                self.vencedor = -1
+                self.vencedor = 1
                 self.game_over = True
             self.etapa = self.ultima_etapa
 
