@@ -1,8 +1,10 @@
 import copy
+import numpy as np
 from time import time_ns
 
+
 def calcular_movimento(trilha, profundidade, cor_do_jogador):
-	score, jogada = minimax(trilha, profundidade, -10000, 10000, True, cor_do_jogador)
+	score, jogada = minimax(trilha, profundidade, -np.inf, np.inf, True, cor_do_jogador)
 	return jogada
 
 
@@ -14,34 +16,41 @@ def minimax(trilha, profundidade, alpha, beta, jogador_maximizador, cor_do_jogad
 			return -100, None
 
 	if profundidade == 0:
-		if cor_do_jogador == 1:
-			return trilha.numero_de_pecas_branco**2 - trilha.numero_de_pecas_preto**2, None
-		else:
-			return trilha.numero_de_pecas_preto**2 - trilha.numero_de_pecas_branco**2, None
+		return trilha.numero_de_pecas[trilha.indice(cor_do_jogador)] - trilha.numero_de_pecas[trilha.indice((-1)*cor_do_jogador)], None
 
 	if jogador_maximizador:
-		maximo = -1000
-		for jogada in trilha.jogadas_validas():
+		maximo = -np.inf
+		jogadas_validas = trilha.jogadas_validas(cor_do_jogador)
+		if len(jogadas_validas) > 0:
+			chosen_move = jogadas_validas[0]
+		else:
+			return maximo, None
+		for jogada in jogadas_validas:
 			trilha_filha = copy.deepcopy(trilha)
 			trilha_filha.executar_jogada(jogada)
-			avaliacao, _ = minimax(trilha_filha, profundidade - 1, alpha, beta, False, cor_do_jogador)
-			if avaliacao > maximo:
-				maximo = avaliacao
+			resultado, _ = minimax(trilha_filha, profundidade - 1, alpha, beta, False, cor_do_jogador)
+			if resultado > maximo:
+				maximo = resultado
 				chosen_move = jogada
-			alpha = max(alpha, avaliacao)
+			alpha = max(alpha, maximo)
 			if beta <= alpha:
 				break
 		return maximo, chosen_move
 	else:
-		minimo = 1000
-		for jogada in trilha.jogadas_validas():
+		minimo = np.inf
+		jogadas_validas = trilha.jogadas_validas(cor_do_jogador)
+		if len(jogadas_validas) > 0:
+			chosen_move = jogadas_validas[0]
+		else:
+			return minimo, None
+		for jogada in jogadas_validas:
 			trilha_filha = copy.deepcopy(trilha)
 			trilha_filha.executar_jogada(jogada)
-			avaliacao, _ = minimax(trilha_filha, profundidade - 1, alpha, beta, True, cor_do_jogador)
-			if avaliacao < minimo:
-				minimo = avaliacao
+			resultado, _ = minimax(trilha_filha, profundidade - 1, alpha, beta, True, cor_do_jogador)
+			if resultado < minimo:
+				minimo = resultado
 				chosen_move = jogada
-			beta = min(beta, avaliacao)
+			beta = min(beta, minimo)
 			if beta <= alpha:
 				break
-	return minimo, chosen_move
+		return minimo, chosen_move

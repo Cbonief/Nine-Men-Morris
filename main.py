@@ -1,8 +1,8 @@
 import pygame
-from trilha import Jogo
+from jogo import Jogo
 
 if __name__ == "__main__":
-    win = pygame.display.set_mode((600, 600))
+    janela = pygame.display.set_mode((600, 600))
     pygame.init()
-    jogo = Jogo(win)
-    jogo.run()
+    jogo = Jogo(janela)
+    jogo.jogar()
