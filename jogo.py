@@ -143,8 +143,8 @@ class Jogo:
 
         botoes_janela_config['Fechar'].conectar_acao(self.fechar_jogo)
         botoes_janela_config['Voltar'].conectar_acao(self.mudar_janela, Janela.MENU)
-        botoes_janela_config['Aumentar'].conectar_acao(self.mudar_nivel_da_AI, 1)
-        botoes_janela_config['Diminuir'].conectar_acao(self.mudar_nivel_da_AI, -1)
+        botoes_janela_config['Aumentar'].conectar_acao(self.mudar_nivel_da_ai, 1)
+        botoes_janela_config['Diminuir'].conectar_acao(self.mudar_nivel_da_ai, -1)
         botoes_janela_config['Play'].conectar_acao(self.iniciar_jogo, True)
 
         paineis_janela_principal = {
@@ -240,8 +240,8 @@ class Jogo:
     def mudar_janela(self, janela):
         self.janela_ativa = janela
 
-    def iniciar_jogo(self, contra_AI=False):
-        self.jogando_contra_AI = contra_AI
+    def iniciar_jogo(self, contra_ai=False):
+        self.jogando_contra_AI = contra_ai
         self.janela_ativa = Janela.JOGO
         if self.jogando_contra_AI:
             if self.janela[Janela.CONFIG].botoes['Cor'].estado:
@@ -249,7 +249,7 @@ class Jogo:
             else:
                 self.cor_escolhida = Jogador.BRANCO
 
-    def mudar_nivel_da_AI(self, dif):
+    def mudar_nivel_da_ai(self, dif):
         if 1 <= self.profundidade + dif <= 7:
             self.profundidade = self.profundidade + dif
             self.janela[Janela.CONFIG].paineis['Nivel'].escrever(str(self.profundidade))
@@ -270,7 +270,7 @@ class Jogo:
         # Caso seja a vez da AI, calcula sua jogada.
         if not self.trilha.game_over:
             if self.trilha.jogador_ativo == -self.cor_escolhida and self.jogando_contra_AI:
-                self.jogada = negamax.calcular_movimento(self.trilha, 5, -self.cor_escolhida)
+                self.jogada = negamax.calcular_movimento(self.trilha, self.profundidade, -self.cor_escolhida)
 
             # Executa a jogada, seja da AI ou do jogador.
             if self.jogada and self.jogada.valida(self.trilha):

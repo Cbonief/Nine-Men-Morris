@@ -7,6 +7,7 @@ pygame.freetype.init()
 
 class Cor:
     PRETO = (0, 0, 0)
+    BRANCO = (255, 255, 255)
 
 
 class Borda:
@@ -140,7 +141,6 @@ class PushButton:
                     self.foi_apertado = True
 
     def acionar_funcao(self):
-        print("Botao do argumento {}".format(self.args))
         if self.funcao:
             if self.args is not None:
                 self.funcao(self.args)
