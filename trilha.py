@@ -9,12 +9,20 @@ class Jogada:
         self.posicao_final = posicao_final
 
     def __eq__(self, other):
-        same_type = self.tipo == other.tipo
-        same_pos = self.posicao[0] == other.posicao[0] and self.posicao[1] == other.posicao[1]
-        same_end_pos = True
-        if self.tipo == 'Movimentar' and same_type:
-            same_end_pos = self.posicao_final[0] == other.posicao_final[0] and self.posicao_final[1] == other.posicao_final[1]
-        return same_type and same_pos and same_end_pos
+        return self.__hash__() == other.__hash__()
+
+    def __hash__(self):
+        a = 1
+        if self.tipo == 'Movimentar':
+            a = 2
+        elif self.tipo == 'RemoverPeca':
+            a = 3
+        b = 10*(self.posicao[0]+1) + (self.posicao[1]+1)
+        if self.tipo == 'Movimentar':
+            c = 10*(self.posicao_final[0]+1)+(self.posicao_final[1]+1)
+            return 10000*a + b * 100 + c
+        else:
+            return 100*a + b
 
     def reversa(self):
         if self.tipo == 'Movimentar':
@@ -44,6 +52,22 @@ class Jogada:
             return 'Mover a Peça da Posição {} para {}'.format(self.posicao, self.posicao_final)
 
 
+def criar_jogada_a_partir_do_codigo(codigo):
+    elementos = []
+    string = str(codigo)
+    for c in string:
+        elementos.append(int(c))
+    tipo = elementos[0]
+    posicao = [elementos[1]-1, elementos[2]-1]
+    if tipo == 2:
+        posicao_final = [elementos[3]-1, elementos[4]-1]
+        return Jogada(posicao, 'Movimentar', posicao_final)
+    elif tipo == 1:
+        return Jogada(posicao, 'ColocarPeca')
+    else:
+        return Jogada(posicao, 'RemoverPeca')
+
+
 class Jogador:
     BRANCO = 1
     PRETO = -1
@@ -63,6 +87,7 @@ class Trilha:
         self.jogar_voando = [False, False]
         self.game_over = False
         self.ultima_jogada = None
+        self.primeira_jogada = [True, True]
 
     @staticmethod
     def indice(jogador):
@@ -86,6 +111,8 @@ class Trilha:
         return self.tabuleiro[posicao[0]][posicao[1]]
 
     def executar_jogada(self, jogada):
+        if self.primeira_jogada[self.indice(self.jogador_ativo)]:
+            self.primeira_jogada[self.indice(self.jogador_ativo)] = False
         self.ultima_jogada = jogada
         if jogada.tipo == 'ColocarPeca' and self.etapa == 0:
             self.colocar_peca(jogada.posicao)
@@ -102,7 +129,6 @@ class Trilha:
                     self.game_over = True
                 elif self.numero_de_pecas[self.indice((-1)*self.jogador_ativo)] == 3:
                     self.jogar_voando[self.indice((-1)*self.jogador_ativo)] = True
-                    print("Jogador voando")
             self.etapa = self.ultima_etapa
 
         if len(self.jogadas_validas((-1)*self.jogador_ativo)) == 0:
@@ -190,3 +216,14 @@ class Trilha:
                         jogadas.append(Jogada([i, j], 'RemoverPeca'))
         return jogadas
 
+    def __hash__(self):
+        n = [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71, 73, 79, 83, 89, 97]
+        indice = 0
+        valor = 1
+        for i in range(0, 8):
+            for j in range(0, 8):
+                if self.tabuleiro[i][j] is not None:
+                    if self.tabuleiro[i][j] != 0:
+                        valor = valor * np.power(n[indice], (self.tabuleiro[i][j] + 3)/2)
+                    indice += 1
+        return int(valor*np.power(n[indice], self.etapa + 1))

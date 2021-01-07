@@ -1,10 +1,24 @@
 import copy
 import numpy as np
 from time import time_ns
+from queue import Queue
+from threading import Thread
+from trilha import Jogador, criar_jogada_a_partir_do_codigo
+import os
+import json
+
+with open(os.path.join("Assets", "primeiras_jogadas.json"), "r") as read_file:
+	primeiras_jogadas = json.load(read_file)
 
 
 def calcular_movimento(trilha, profundidade, cor_do_jogador):
-	score, jogada = minimax(trilha, profundidade, -np.inf, np.inf, True, cor_do_jogador)
+	if trilha.primeira_jogada[trilha.indice(cor_do_jogador)]:
+		if cor_do_jogador == Jogador.PRETO:
+			jogada = criar_jogada_a_partir_do_codigo(primeiras_jogadas[trilha.indice(Jogador.PRETO)][profundidade-1][str(hash(trilha))])
+		else:
+			jogada = criar_jogada_a_partir_do_codigo(primeiras_jogadas[trilha.indice(Jogador.BRANCO)][profundidade-1])
+	else:
+		_, jogada = minimax(trilha, profundidade, -np.inf, np.inf, True, cor_do_jogador)
 	return jogada
 
 
@@ -16,7 +30,7 @@ def minimax(trilha, profundidade, alpha, beta, jogador_maximizador, cor_do_jogad
 			return -100, None
 
 	if profundidade == 0:
-		return trilha.numero_de_pecas[trilha.indice(cor_do_jogador)] - trilha.numero_de_pecas[trilha.indice((-1)*cor_do_jogador)], None
+		return 2*trilha.numero_de_pecas[trilha.indice(cor_do_jogador)] - trilha.numero_de_pecas[trilha.indice((-1)*cor_do_jogador)], None
 
 	if jogador_maximizador:
 		maximo = -np.inf
