@@ -37,68 +37,69 @@ positions[7][4] = [300, 600-116]
 positions[7][5] = [300, 600-24]
 
 
-def posicoes_adjacentes(posicao):
-    if posicao[0] == 0 and posicao[1] == 0:
+def adjacent_positions(position):
+    if position[0] == 0 and position[1] == 0:
         return [[0, 6], [6, 0]]
-    elif posicao[0] == 0 and posicao[1] == 6:
+    elif position[0] == 0 and position[1] == 6:
         return [[0, 0], [0, 5], [1, 6]]
-    elif posicao[0] == 0 and posicao[1] == 5:
+    elif position[0] == 0 and position[1] == 5:
         return [[0, 6], [7, 5]]
-    elif posicao[0] == 1 and posicao[1] == 1:
+    elif position[0] == 1 and position[1] == 1:
         return [[6, 1], [1, 6]]
-    elif posicao[0] == 1 and posicao[1] == 6:
+    elif position[0] == 1 and position[1] == 6:
         return [[1, 1], [0, 6], [1, 4], [2, 6]]
-    elif posicao[0] == 1 and posicao[1] == 4:
+    elif position[0] == 1 and position[1] == 4:
         return [[1, 6], [7, 4]]
-    elif posicao[0] == 2 and posicao[1] == 2:
+    elif position[0] == 2 and position[1] == 2:
         return [[6, 2], [2, 6]]
-    elif posicao[0] == 2 and posicao[1] == 6:
+    elif position[0] == 2 and position[1] == 6:
         return [[2, 2], [1, 6], [2, 3]]
-    elif posicao[0] == 2 and posicao[1] == 3:
+    elif position[0] == 2 and position[1] == 3:
         return [[2, 6], [7, 3]]
-    elif posicao[0] == 3 and posicao[1] == 2:
+    elif position[0] == 3 and position[1] == 2:
         return [[6, 2], [3, 7]]
-    elif posicao[0] == 3 and posicao[1] == 7:
+    elif position[0] == 3 and position[1] == 7:
         return [[3, 2], [4, 7], [3, 3]]
-    elif posicao[0] == 3 and posicao[1] == 3:
+    elif position[0] == 3 and position[1] == 3:
         return [[3, 7], [7, 3]]
-    elif posicao[0] == 4 and posicao[1] == 1:
+    elif position[0] == 4 and position[1] == 1:
         return [[6, 1], [4, 7]]
-    elif posicao[0] == 4 and posicao[1] == 7:
+    elif position[0] == 4 and position[1] == 7:
         return [[4, 1], [3, 7], [4, 4], [5, 7]]
-    elif posicao[0] == 4 and posicao[1] == 4:
+    elif position[0] == 4 and position[1] == 4:
         return [[7, 4], [4, 7]]
-    elif posicao[0] == 5 and posicao[1] == 0:
+    elif position[0] == 5 and position[1] == 0:
         return [[6, 0], [5, 7]]
-    elif posicao[0] == 5 and posicao[1] == 7:
+    elif position[0] == 5 and position[1] == 7:
         return [[5, 0], [4, 7], [5, 5]]
-    elif posicao[0] == 5 and posicao[1] == 5:
+    elif position[0] == 5 and position[1] == 5:
         return [[5, 7], [7, 5]]
-    elif posicao[0] == 6 and posicao[1] == 0:
+    elif position[0] == 6 and position[1] == 0:
         return [[0, 0], [5, 0], [6, 1]]
-    elif posicao[0] == 6 and posicao[1] == 1:
+    elif position[0] == 6 and position[1] == 1:
         return [[6, 0], [1, 1], [4, 1], [6, 2]]
-    elif posicao[0] == 6 and posicao[1] == 2:
+    elif position[0] == 6 and position[1] == 2:
         return [[6, 1], [2, 2], [3, 2]]
-    elif posicao[0] == 7 and posicao[1] == 3:
+    elif position[0] == 7 and position[1] == 3:
         return [[2, 3], [3, 3], [7, 4]]
-    elif posicao[0] == 7 and posicao[1] == 4:
+    elif position[0] == 7 and position[1] == 4:
         return [[7, 3], [1, 4], [4, 4], [7, 5]]
-    elif posicao[0] == 7 and posicao[1] == 5:
+    elif position[0] == 7 and position[1] == 5:
         return [[7, 4], [0, 5], [5, 5]]
     else:
         return None
 
-adj_list = []
+
+adjacency_list = []
 for i in range(0, 8):
-    adj_list.append([])
+    adjacency_list.append([])
     for j in range(0, 8):
-        adj_list[i].append(posicoes_adjacentes([i,j]))
+        adjacency_list[i].append(adjacent_positions([i, j]))
 
 
-def posicao_adjacente(posicao, outra_posicao):
-    for adjacente in adj_list[posicao[0]][posicao[1]]:
-        if adjacente[0] == outra_posicao[0] and adjacente[1] == outra_posicao[1]:
+def is_position_adjacent(this_position, other_position):
+    for adjacente in adjacency_list[this_position[0]][this_position[1]]:
+        if adjacente[0] == other_position[0] and adjacente[1] == other_position[1]:
             return True
     return False
 
@@ -109,40 +110,40 @@ def posicao_adjacente(posicao, outra_posicao):
 #         if adj_list[i][j]:
 #             print("[{},{}] -> {}".format(i,j, adj_list[i][j]))
 
-tabuleiro = []
+board = []
 for i in range(0, 8):
-    tabuleiro.append([])
+    board.append([])
     for j in range(0, 8):
-        tabuleiro[i].append(None)
+        board[i].append(None)
 
-tabuleiro[0][0] = 0
-tabuleiro[0][6] = 0
-tabuleiro[0][5] = 0
+board[0][0] = 0
+board[0][6] = 0
+board[0][5] = 0
 
-tabuleiro[1][1] = 0
-tabuleiro[1][4] = 0
-tabuleiro[1][6] = 0
+board[1][1] = 0
+board[1][4] = 0
+board[1][6] = 0
 
-tabuleiro[2][2] = 0
-tabuleiro[2][6] = 0
-tabuleiro[2][3] = 0
+board[2][2] = 0
+board[2][6] = 0
+board[2][3] = 0
 
-tabuleiro[3][2] = 0
-tabuleiro[3][7] = 0
-tabuleiro[3][3] = 0
+board[3][2] = 0
+board[3][7] = 0
+board[3][3] = 0
 
-tabuleiro[4][1] = 0
-tabuleiro[4][7] = 0
-tabuleiro[4][4] = 0
+board[4][1] = 0
+board[4][7] = 0
+board[4][4] = 0
 
-tabuleiro[5][0] = 0
-tabuleiro[5][7] = 0
-tabuleiro[5][5] = 0
+board[5][0] = 0
+board[5][7] = 0
+board[5][5] = 0
 
-tabuleiro[6][0] = 0
-tabuleiro[6][1] = 0
-tabuleiro[6][2] = 0
+board[6][0] = 0
+board[6][1] = 0
+board[6][2] = 0
 
-tabuleiro[7][3] = 0
-tabuleiro[7][4] = 0
-tabuleiro[7][5] = 0
+board[7][3] = 0
+board[7][4] = 0
+board[7][5] = 0

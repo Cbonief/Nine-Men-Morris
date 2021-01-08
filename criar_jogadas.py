@@ -1,6 +1,6 @@
 from Assets import *
 from minimax import *
-from trilha import *
+from mills import *
 import copy
 import os
 import json
@@ -13,7 +13,7 @@ import json
 # primeira_jogada = []
 #
 # # Calculo do preto.
-trilha = Trilha()
+trilha = Mills()
 # primeira_jogada.append([])
 # for profundidade in range(1, 2):
 #     primeira_jogada[trilha.indice(Jogador.PRETO)].append({})

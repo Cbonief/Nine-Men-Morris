@@ -1,11 +1,11 @@
 import numpy as np
 import copy
-from trilha import *
+from mills import *
 import os
 import json
 
 with open(os.path.join("Assets", "primeiras_jogadas.json"), "r") as read_file:
-    primeiras_jogadas = json.load(read_file)
+    first_moves = json.load(read_file)
 
 
 class Flag:
@@ -14,89 +14,89 @@ class Flag:
     UPPERBOUND = 1
 
 
-class Dado:
-    def __init__(self, profundidade, score, jogada, flag):
+class Data:
+    def __init__(self, depth, score, best_move, flag):
         self.flag = flag
-        self.profundidade = profundidade
+        self.depth = depth
         self.score = score
-        self.jogada = jogada
+        self.best_move = best_move
 
 
-tabela_de_transposicao = {}
+transposition_table = {}
 
 
-def verificar_tabela_de_transposicao(trilha):
-    if hash(trilha) in tabela_de_transposicao.keys():
-        return tabela_de_transposicao[hash(trilha)]
+def lookup_table(mill):
+    if hash(mill) in transposition_table.keys():
+        return transposition_table[hash(mill)]
     else:
         return None
 
 
-def adicionar_dado(trilha, dado):
-    tabela_de_transposicao[hash(trilha)] = dado
+def add_data_to_table(mill, new_data):
+    transposition_table[hash(mill)] = new_data
 
 
-def calcular_movimento(trilha, profundidade, cor_do_jogador):
-    if trilha.primeira_jogada[trilha.indice(cor_do_jogador)]:
-        if cor_do_jogador == Jogador.PRETO:
-            jogada = criar_jogada_a_partir_do_codigo(primeiras_jogadas[trilha.indice(Jogador.PRETO)][profundidade-1][str(hash(trilha))])
+def calculate_movement(mill, depth, player_color):
+    if mill.is_first_move[mill.indice(player_color)]:
+        if player_color == Player.BLACK:
+            move = create_move_from_hash(first_moves[mill.indice(Player.BLACK)][depth - 1][str(hash(mill))])
         else:
-            jogada = criar_jogada_a_partir_do_codigo(primeiras_jogadas[trilha.indice(Jogador.BRANCO)][profundidade-1])
+            move = create_move_from_hash(first_moves[mill.indice(Player.WHITE)][depth - 1])
     else:
-        _, jogada = negamax(trilha, profundidade, -np.inf, np.inf, cor_do_jogador)
-    return jogada
+        _, move = negamax(mill, depth, -np.inf, np.inf, player_color)
+    return move
 
 
-def negamax(trilha, profundidade, alpha, beta, cor_do_jogador):
+def negamax(mill, depth, alpha, beta, player_color):
     alpha0 = alpha
 
-    dado = verificar_tabela_de_transposicao(trilha)
-    if dado is not None and dado.profundidade >= profundidade:
-        if dado.flag == Flag.EXACT:
-            return dado.score, dado.jogada
-        elif dado.flag == Flag.LOWERBOUND:
-            alpha = max(alpha, dado.score)
-        elif dado.flag == Flag.UPPERBOUND:
-            beta = min(beta, dado.score)
+    data = lookup_table(mill)
+    if data is not None and data.depth >= depth:
+        if data.flag == Flag.EXACT:
+            return data.score, data.best_move
+        elif data.flag == Flag.LOWERBOUND:
+            alpha = max(alpha, data.score)
+        elif data.flag == Flag.UPPERBOUND:
+            beta = min(beta, data.score)
 
         if alpha >= beta:
-            return dado.score, dado.jogada
+            return data.score, data.best_move
 
-    if trilha.game_over:
-        if trilha.vencedor == cor_do_jogador:
+    if mill.game_over:
+        if mill.winner == player_color:
             return 100, None
         else:
             return -100, None
 
-    if profundidade == 0:
-        return trilha.numero_de_pecas[trilha.indice(cor_do_jogador)] - trilha.numero_de_pecas[
-            trilha.indice((-1) * cor_do_jogador)], None
+    if depth == 0:
+        return mill.number_of_pieces[mill.indice(player_color)] - mill.number_of_pieces[
+            mill.indice((-1) * player_color)], None
 
-    maximo = -np.inf
-    jogadas_validas = trilha.jogadas_validas(cor_do_jogador)
-    if len(jogadas_validas) > 0:
-        jogada_escolhida = jogadas_validas[0]
+    maximum = -np.inf
+    valid_moves = mill.get_all_valid_moves(player_color)
+    if len(valid_moves) > 0:
+        chosen_move = valid_moves[0]
     else:
-        return maximo, None
-    for jogada in jogadas_validas:
-        trilha_filha = copy.deepcopy(trilha)
-        trilha_filha.executar_jogada(jogada)
-        resultado, _ = negamax(trilha_filha, profundidade - 1, -beta, -alpha, -cor_do_jogador)
-        resultado = - resultado
-        if resultado > maximo:
-            maximo = resultado
-            jogada_escolhida = jogada
-        alpha = max(alpha, maximo)
+        return maximum, None
+    for move in valid_moves:
+        child_mill = copy.deepcopy(mill)
+        child_mill.execute_move(move)
+        result, _ = negamax(child_mill, depth - 1, -beta, -alpha, -player_color)
+        result = - result
+        if result > maximum:
+            maximum = result
+            chosen_move = move
+        alpha = max(alpha, maximum)
         if beta <= alpha:
             break
 
-    novo_dado = Dado(profundidade, maximo, jogada_escolhida, None)
-    if maximo <= alpha0:
-        novo_dado.flag = Flag.UPPERBOUND
-    elif maximo >= beta:
-        novo_dado.flag = Flag.LOWERBOUND
+    new_data = Data(depth, maximum, chosen_move, None)
+    if maximum <= alpha0:
+        new_data.flag = Flag.UPPERBOUND
+    elif maximum >= beta:
+        new_data.flag = Flag.LOWERBOUND
     else:
-        novo_dado.flag = Flag.EXACT
-    adicionar_dado(trilha, novo_dado)
+        new_data.flag = Flag.EXACT
+    add_data_to_table(mill, new_data)
 
-    return maximo, jogada_escolhida
+    return maximum, chosen_move

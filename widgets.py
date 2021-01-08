@@ -5,212 +5,238 @@ import pygame
 pygame.freetype.init()
 
 
-class Cor:
-    PRETO = (0, 0, 0)
-    BRANCO = (255, 255, 255)
+# Enumerador de cores. Adicionar as que forem necessárias.
+class Color:
+    BLACK = (0, 0, 0)
+    WHITE = (255, 255, 255)
 
 
-class Borda:
-    def __init__(self, grossura, cor):
-        self.grossura = grossura
-        self.cor = cor
+# Classe que determina uma borda:
+# Contém uma grossura, e cor, além disso é necessário calcular os vértices de seu retângulo depois.
+class Border:
+    def __init__(self, width, color):
+        self.width = width
+        self.color = color
         self.vertices = None
 
+    def calculate_vertices(self, rect):
+        self.vertices = (rect.position[0] - self.width, rect.position[1] - self.width, rect.size[0] + self.width,
+         rect.size[1] + self.width)
 
-class Texto:
-    def __init__(self, text, pt, cor, font='Comic Sans MS'):
+
+class Text:
+    def __init__(self, text, pt, color, font='Comic Sans MS'):
         self.txt = text
         self.pt = pt
-        self.cor = cor
+        self.color = color
         self.font = pygame.freetype.SysFont(font, pt)
 
 
-def quadratura(p, q):
+# Retorna o quadratura de dois vetores p, q, ou seja, o quadrado da distância entre eles.
+def quadrature(p, q):
     return (p[0] - q[0]) ** 2 + (p[1] - q[1]) ** 2
 
 
+# Determina se uma posição está dentro do retângulo, definido pela posição do vértice superior esquerdo
+# e o tamanho de suas arestas.
+def is_in_rect(position, rect):
+    if rect.position[0] <= position[0] <= rect.position[0] + rect.size[0]:
+        if rect.position[1] <= position[1] <= rect.position[1] + rect.size[1]:
+            return True
+        else:
+            return False
+    else:
+        return False
+
+
+# Determina se uma posição está dentro do círculo, definido pela posição do centro e o seu raio.
+def is_in_circle(position, circle):
+    return quadrature(position, circle.position) <= circle.size**2
+
+
 class ToggleButton:
-    def __init__(self, posicao, tamanho, imagens, texto=None):
-        self.visivel = True
-        self.clickavel = True
-        self.funcao = None
-        self.texto = texto
-        tipo = 'Circular'
-        if type(tamanho) != int:
-            tipo = 'Retangular'
-        self.tamanho = tamanho
-        self.posicao = posicao
-        self.imagens = []
-        for imagem in imagens:
-            if tipo == 'Retangular':
-                self.imagens.append(pygame.transform.scale(imagem, self.tamanho))
+    def __init__(self, position, size, images, hint_text=None):
+        self.visible = True
+        self.clickable = True
+        self.connected_function = None
+        self.args = None
+        self.hint_text = hint_text
+        shape = 'Circular'
+        if type(size) != int:
+            shape = 'Retangular'
+        self.size = size
+        self.position = position
+        self.images = []
+        for img in images:
+            if shape == 'Retangular':
+                self.images.append(pygame.transform.scale(img, self.size))
             else:
-                self.imagens.append(pygame.transform.scale(imagem, [self.tamanho, self.tamanho]))
-        self.estado = False
-        self.tipo = tipo
-        self.contador_de_frame = 0
-        self.atividade_modificada = False
+                self.images.append(pygame.transform.scale(img, [self.size, self.size]))
+        self.is_pressed = False
+        self.shape = shape
+        self.frame_counter = 0
+        self.properties_changed = False
 
-    def conectar_acao(self, funcao):
-        self.funcao = funcao
+    def connect_function(self, function, args=None):
+        self.connected_function = function
+        self.args = args
 
-    def detectar_click(self, posicao_do_mouse):
-        if self.clickavel and not self.atividade_modificada:
-            if self.tipo == 'Retangular':
-                if self.posicao[0] <= posicao_do_mouse[0] <= self.posicao[0] + self.tamanho[0] and self.posicao[1] <= posicao_do_mouse[1] <= self.posicao[1] + self.tamanho[1]:
-                    self.estado = not self.estado
-                    if self.funcao:
-                        self.funcao()
+    def detect_click(self, mouse_position):
+        if self.clickable and not self.properties_changed:
+            if self.shape == 'Retangular':
+                if is_in_rect(mouse_position, self):
+                    self.is_pressed = not self.is_pressed
+                    if self.connected_function:
+                        self.connected_function()
             else:
-                if quadratura(posicao_do_mouse, self.posicao) <= self.tamanho**2:
-                    self.estado = not self.estado
-                    if self.funcao:
-                        self.funcao()
+                if is_in_circle(mouse_position, self):
+                    self.is_pressed = not self.is_pressed
+                    if self.connected_function:
+                        self.connected_function()
 
-    def mostrar(self, window):
-        if self.visivel:
-            if self.estado:
-                window.blit(self.imagens[1], self.posicao)
+    def show(self, window):
+        if self.visible:
+            if self.is_pressed:
+                window.blit(self.images[1], self.position)
             else:
-                window.blit(self.imagens[0], self.posicao)
-            if self.atividade_modificada:
-                self.contador_de_frame += 1
-                if self.contador_de_frame == 1:
-                    self.contador_de_frame = 0
-                    self.atividade_modificada = False
-            if self.texto:
-                renderizador_do_texto, _ = self.texto.font.render(self.texto.txt, self.texto.cor)
-                rect = renderizador_do_texto.get_rect(
-                    center=(self.posicao[0] + self.tamanho[0] // 2, self.posicao[1] + self.tamanho[1] / 2))
-                window.blit(renderizador_do_texto, rect)
+                window.blit(self.images[0], self.position)
+            if self.properties_changed:
+                self.frame_counter += 1
+                if self.frame_counter == 1:
+                    self.frame_counter = 0
+                    self.properties_changed = False
+            if self.hint_text:
+                text_render, _ = self.hint_text.font.render(self.hint_text.txt, self.hint_text.color)
+                rect = text_render.get_rect(
+                    center=(self.position[0] + self.size[0] // 2, self.position[1] + self.size[1] / 2))
+                window.blit(text_render, rect)
 
-    def desativar(self):
-        self.clickavel = False
-        self.visivel = False
-        self.atividade_modificada = True
+    def disable(self):
+        self.clickable = False
+        self.visible = False
+        self.properties_changed = True
 
-    def ativar(self):
-        self.clickavel = True
-        self.visivel = True
-        self.atividade_modificada = True
+    def enable(self):
+        self.clickable = True
+        self.visible = True
+        self.properties_changed = True
 
-    def desativar_click(self):
-        self.clickavel = False
+    def make_unclickable(self):
+        self.clickable = False
 
-    def ativar_click(self):
-        self.clickavel = True
+    def make_clickable(self):
+        self.clickable = True
 
 
 # Classe do botão
 class PushButton:
-    def __init__(self, posicao, tamanho, imagens, frames_apertados=5, texto=None):
-        self.visivel = True
-        self.clickavel = True
-        self.funcao = None
-        self.texto = texto
-        tipo = 'Circular'
-        if type(tamanho) != int:
-            tipo = 'Retangular'
-        self.tamanho = tamanho
-        self.posicao = posicao
-        self.imagens = []
-        for imagem in imagens:
-            if tipo == 'Retangular':
-                self.imagens.append(pygame.transform.scale(imagem, self.tamanho))
+    def __init__(self, position, size, images, pressed_animation_length=5, hint_text=None):
+        self.visible = True
+        self.clickable = True
+        self.connected_function = None
+        self.hint_text = hint_text
+        shape = 'Circular'
+        if type(size) != int:
+            shape = 'Retangular'
+        self.size = size
+        self.position = position
+        self.images = []
+        for img in images:
+            if shape == 'Retangular':
+                self.images.append(pygame.transform.scale(img, self.size))
             else:
-                self.imagens.append(pygame.transform.scale(imagem, [self.tamanho, self.tamanho]))
-        self.foi_apertado = False
-        self.tipo = tipo
-        self.frames_apertados = frames_apertados
-        self.contador_de_frame = 0
-        self.atividade_modificada = False
+                self.images.append(pygame.transform.scale(img, [self.size, self.size]))
+        self.pressed = False
+        self.shape = shape
+        self.pressed_animation_length = pressed_animation_length
+        self.frame_counter = 0
+        self.properties_changed = False
         self.args = None
 
-    def conectar_acao(self, funcao, args=None):
-        self.funcao = funcao
+    def connect_function(self, function, args=None):
+        self.connected_function = function
         self.args = args
 
-    def detectar_click(self, posicao_do_mouse):
-        if self.clickavel and not self.atividade_modificada:
-            if self.tipo == 'Retangular':
-                if self.posicao[0] <= posicao_do_mouse[0] <= self.posicao[0] + self.tamanho[0] and self.posicao[1] <= \
-                        posicao_do_mouse[1] <= self.posicao[1] + self.tamanho[1]:
-                    self.foi_apertado = True
+    def detect_click(self, mouse_position):
+        if self.clickable and not self.properties_changed:
+            if self.shape == 'Retangular':
+                if self.position[0] <= mouse_position[0] <= self.position[0] + self.size[0] and self.position[1] <= \
+                        mouse_position[1] <= self.position[1] + self.size[1]:
+                    self.pressed = True
             else:
-                if quadratura(posicao_do_mouse, self.posicao) <= self.tamanho**2:
-                    self.foi_apertado = True
+                if quadrature(mouse_position, self.position) <= self.size**2:
+                    self.pressed = True
 
-    def acionar_funcao(self):
-        if self.funcao:
+    def activate_connected_function(self):
+        if self.connected_function:
             if self.args is not None:
-                self.funcao(self.args)
+                self.connected_function(self.args)
             else:
-                self.funcao()
+                self.connected_function()
 
-
-    def mostrar(self, window):
-        if self.visivel:
-            if self.foi_apertado:
-                window.blit(self.imagens[1], self.posicao)
-                self.contador_de_frame += 1
-                if self.contador_de_frame == self.frames_apertados:
-                    self.contador_de_frame = 0
-                    self.acionar_funcao()
-                    self.foi_apertado = False
+    def show(self, window):
+        if self.visible:
+            if self.pressed:
+                window.blit(self.images[1], self.position)
+                self.frame_counter += 1
+                if self.frame_counter == self.pressed_animation_length:
+                    self.frame_counter = 0
+                    self.activate_connected_function()
+                    self.pressed = False
             else:
-                window.blit(self.imagens[0], self.posicao)
-            if self.atividade_modificada:
-                self.contador_de_frame += 1
-                if self.contador_de_frame == 1:
-                    self.contador_de_frame = 0
-                    self.atividade_modificada = False
-            if self.texto:
-                renderizador_do_texto, _ = self.texto.font.render(self.texto.txt, self.texto.cor)
-                rect = renderizador_do_texto.get_rect(
-                    center=(self.posicao[0] + self.tamanho[0] // 2, self.posicao[1] + self.tamanho[1] / 2))
-                window.blit(renderizador_do_texto, rect)
+                window.blit(self.images[0], self.position)
+            if self.properties_changed:
+                self.frame_counter += 1
+                if self.frame_counter == 1:
+                    self.frame_counter = 0
+                    self.properties_changed = False
+            if self.hint_text:
+                text_render, _ = self.hint_text.font.render(self.hint_text.txt, self.hint_text.color)
+                rect = text_render.get_rect(
+                    center=(self.position[0] + self.size[0] // 2, self.position[1] + self.size[1] / 2))
+                window.blit(text_render, rect)
 
-    def desativar(self):
-        self.clickavel = False
-        self.visivel = False
-        self.atividade_modificada = True
+    def disable(self):
+        self.clickable = False
+        self.visible = False
+        self.properties_changed = True
 
-    def ativar(self):
-        self.clickavel = True
-        self.visivel = True
-        self.atividade_modificada = True
+    def enable(self):
+        self.clickable = True
+        self.visible = True
+        self.properties_changed = True
 
-    def desativar_click(self):
-        self.clickavel = False
+    def make_unclickable(self):
+        self.clickable = False
 
-    def ativar_click(self):
-        self.clickavel = True
+    def make_clickable(self):
+        self.clickable = True
 
 
-class Painel:
-    def __init__(self, posicao, tamanho, imagem, borda=Borda(0, (0, 0, 0)), texto=Texto('None', 0, Cor.PRETO)):
-        self.ativo = True
-        self.texto = texto
-        self.tamanho = tamanho
-        self.posicao = posicao
-        self.imagem = pygame.transform.scale(imagem, self.tamanho)
-        self.borda = borda
-        self.borda.vertices = (self.posicao[0]-borda.grossura, self.posicao[1]-borda.grossura, self.tamanho[0]+borda.grossura, self.tamanho[1]+borda.grossura)
+class Panel:
+    def __init__(self, position, size, image, border=Border(0, (0, 0, 0)), text=Text('None', 0, Color.BLACK)):
+        self.enabled = True
+        self.text = text
+        self.size = size
+        self.position = position
+        self.image = pygame.transform.scale(image, self.size)
+        self.border = border
+        self.border.calculate_vertices(self)
 
-    def mostrar(self, window):
-        if self.ativo:
-            if self.borda.grossura != 0:
-                pygame.draw.rect(window, self.borda.cor, self.borda.vertices)
-            window.blit(self.imagem, self.posicao)
-            renderizador_do_texto, _ = self.texto.font.render(self.texto.txt, self.texto.cor)
-            rect = renderizador_do_texto.get_rect(center=(self.posicao[0] + self.tamanho[0] // 2, self.posicao[1]+self.tamanho[1]/2))
-            window.blit(renderizador_do_texto, rect)
+    def show(self, window):
+        if self.enabled:
+            if self.border.width != 0:
+                pygame.draw.rect(window, self.border.color, self.border.vertices)
+            window.blit(self.image, self.position)
+            text_render, _ = self.text.font.render(self.text.txt, self.text.color)
+            rect = text_render.get_rect(center=(self.position[0] + self.size[0] // 2, self.position[1] + self.size[1] / 2))
+            window.blit(text_render, rect)
 
-    def desativar(self):
-        self.ativo = False
+    def disable(self):
+        self.enabled = False
 
-    def ativar(self):
-        self.ativo = True
+    def enable(self):
+        self.enabled = True
 
-    def escrever(self, novo_texto):
-        self.texto.txt = novo_texto
+    def set_text(self, new_text):
+        self.text.txt = new_text
