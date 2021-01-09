@@ -8,30 +8,8 @@ import time
 # Meu código
 import minimax
 import negamax
-from mills import *
-from widgets import PushButton, Text, Border, Panel, Color, ToggleButton
-
-
-class Window:
-    MENU = 0
-    MATCH = 1
-    CONFIG = 2
-
-    def __init__(self, buttons, panels):
-        self.buttons = buttons
-        self.panels = panels
-        self.frame_counter = 0
-        self.wait_complete = False
-
-    def show(self, window):
-        for button in self.buttons.values():
-            button.show(window)
-        for panel in self.panels.values():
-            panel.show(window)
-        if not self.wait_complete:
-            self.frame_counter += 1
-            if self.frame_counter == 3:
-                self.wait_complete = True
+from ninemenmorris import *
+from widgets import PushButton, Text, Border, Panel, Color, ToggleButton, Window
 
 
 # Classe do manager do Jogo.
@@ -45,7 +23,7 @@ class Game:
         self.paused = False
 
         self.move = None
-        self.mill = Mills()
+        self.mill = NineMenMorris()
 
         self.active_window = Window.MENU
         self.piece_being_held = False
@@ -194,13 +172,13 @@ class Game:
 
     def show_piece(self, position, player, piece_in_mill=False):
         if piece_in_mill:
-            self.window.blit(self.pieces_sprites[Mills.indice(player)]['Marcado'], [positions[position[0]][position[1]][0] - 24, positions[position[0]][position[1]][1] - 24])
+            self.window.blit(self.pieces_sprites[NineMenMorris.indice(player)]['Marcado'], [positions[position[0]][position[1]][0] - 24, positions[position[0]][position[1]][1] - 24])
         else:
-            self.window.blit(self.pieces_sprites[Mills.indice(player)]['Normal'], [positions[position[0]][position[1]][0] - 24, positions[position[0]][position[1]][1] - 24])
+            self.window.blit(self.pieces_sprites[NineMenMorris.indice(player)]['Normal'], [positions[position[0]][position[1]][0] - 24, positions[position[0]][position[1]][1] - 24])
 
     def show_piece_following_mouse(self, jogador):
         pos = pygame.mouse.get_pos()
-        self.window.blit(self.pieces_sprites[Mills.indice(jogador)]['Normal'], [pos[0] - 24, pos[1] - 24])
+        self.window.blit(self.pieces_sprites[NineMenMorris.indice(jogador)]['Normal'], [pos[0] - 24, pos[1] - 24])
 
     def menu(self):
         self.window.blit(self.background_sprite, [0, 0])
@@ -305,10 +283,10 @@ class Game:
             {'Normal': pygame.Surface((86, 86), pygame.SRCALPHA, 32), 'Marcado': pygame.Surface((86, 86), pygame.SRCALPHA, 32)},
             {'Normal': pygame.Surface((86, 86), pygame.SRCALPHA, 32), 'Marcado': pygame.Surface((86, 86), pygame.SRCALPHA, 32)}
         ]
-        pieces[Mills.indice(Player.WHITE)]['Normal'].blit(sprite_sheet, (0, 0), (0, 0, 86, 86))
-        pieces[Mills.indice(Player.BLACK)]['Normal'].blit(sprite_sheet, (0, 0), (86, 0, 86, 86))
-        pieces[Mills.indice(Player.WHITE)]['Marcado'].blit(sprite_sheet, (0, 0), (2 * 86, 0, 86, 86))
-        pieces[Mills.indice(Player.BLACK)]['Marcado'].blit(sprite_sheet, (0, 0), (3 * 86, 0, 86, 86))
+        pieces[NineMenMorris.indice(Player.WHITE)]['Normal'].blit(sprite_sheet, (0, 0), (0, 0, 86, 86))
+        pieces[NineMenMorris.indice(Player.BLACK)]['Normal'].blit(sprite_sheet, (0, 0), (86, 0, 86, 86))
+        pieces[NineMenMorris.indice(Player.WHITE)]['Marcado'].blit(sprite_sheet, (0, 0), (2 * 86, 0, 86, 86))
+        pieces[NineMenMorris.indice(Player.BLACK)]['Marcado'].blit(sprite_sheet, (0, 0), (3 * 86, 0, 86, 86))
 
         for player in range(0, 2):
             for name in pieces[player]:

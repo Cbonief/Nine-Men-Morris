@@ -82,7 +82,7 @@ class GameStage:
     REMOVAL = 2
 
 
-class Mills:
+class NineMenMorris:
     def __init__(self):
         self.board = board
         self.stage = GameStage.PLACEMENT

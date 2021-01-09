@@ -1,6 +1,6 @@
 import numpy as np
 import copy
-from mills import *
+from ninemenmorris import *
 import os
 import json
 

@@ -3,7 +3,7 @@ import numpy as np
 from time import time_ns
 from queue import Queue
 from threading import Thread
-from mills import Player, create_move_from_hash
+from ninemenmorris import Player, create_move_from_hash
 import os
 import json
 

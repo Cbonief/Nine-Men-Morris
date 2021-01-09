@@ -240,3 +240,24 @@ class Panel:
 
     def set_text(self, new_text):
         self.text.txt = new_text
+
+class Window:
+    MENU = 0
+    MATCH = 1
+    CONFIG = 2
+
+    def __init__(self, buttons, panels):
+        self.buttons = buttons
+        self.panels = panels
+        self.frame_counter = 0
+        self.wait_complete = False
+
+    def show(self, window):
+        for button in self.buttons.values():
+            button.show(window)
+        for panel in self.panels.values():
+            panel.show(window)
+        if not self.wait_complete:
+            self.frame_counter += 1
+            if self.frame_counter == 3:
+                self.wait_complete = True
