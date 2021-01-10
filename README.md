@@ -91,8 +91,8 @@ The white player will be considered as being equal to 1 and the black player as 
 
 ```python
 class Player:
-	WHITE = 1
-	BLACK = -1
+    WHITE = 1
+    BLACK = -1
 ```
 
 #### The board
@@ -110,9 +110,9 @@ There are three types of possible moves, either you place a piece, move a piece 
 
 ```python
 class MoveType:
-	PLACE_PIECE = 1
-	MOVE_PIECE = 2
-	REMOVE_PIECE = 3
+    PLACE_PIECE = 1
+    MOVE_PIECE = 2
+    REMOVE_PIECE = 3
 ```
 
 We´ll also have a class for the move itself, storing the position where the move will act upon, the type of move and, if it´s a piece movement, the final position of the piece.
