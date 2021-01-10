@@ -87,7 +87,7 @@ The first thing I did was create a Nine Morris game Class to store the board, ac
 
 ##### The players
 
-The white player will be considered as being equal to 1 and the black player as -1. This will be stored in a player class. The numbers were choosen because it´s easy to chang the active player with``active_player = -active_player``.
+The white player will be considered as being equal to 1 and the black player as -1. This will be stored in a player class. The numbers were choosen because it´s easy to chang the active player with ``active_player = -active_player``.
 
 ```python
 class Player:
@@ -101,7 +101,7 @@ The 24 positions of the board will be stored in a **np.array** of size 24, and w
 
 ![Labeled Board](https://imgur.com/nXBDbyN.png)
 
-Doing this means will have to know all possible mill configurations. This I have already done, and wrote in the file [Possible Mills](Assets/possible_mills.txt).
+Doing this means will have to know all possible mill configurations. This I have already done, and wrote in the file [Possible Mills](Assets/possible_mills.py).
 
 
 #### The moves
