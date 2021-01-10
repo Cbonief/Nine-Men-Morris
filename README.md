@@ -28,7 +28,7 @@ There are 3 phases in the game:
 - [Phase Two - Movement](#phase-two)
 - [Phase Three - Flying](#phase-three)
 
-Obviously, the game starts in phase one, and similarly to other two player games, the starting player is always the white one.In all phases the players can form mills and remove the opponent´s pieces. The winning condition is if a player has no legal move, or if a player is left with two pieces, however the game cannot end in phase one!
+Obviously, the game starts in phase one, and similarly to other two player games, the starting player is always the white one. In all phases the players can form mills and remove the opponent´s pieces. The winning condition is if a player has no legal move, or if a player is left with two pieces, however the game cannot end in phase one!
 
 
 ### Phase One
@@ -63,9 +63,13 @@ The game is played on the following board. which consists of 24 locations where 
 
 ### Aditional Info
 You can read more about the game at:
+
 [Wikipedia](https://en.wikipedia.org/wiki/Nine_men%27s_morris "Wikipedia")
+
 [Old Game](https://web.archive.org/web/20041121040028/http://mc2.vicnet.net.au/home/aura/shared_files/Berger1.pdf)
+
 [Perfect Game Solution](http://library.msri.org/books/Book29/files/gasser.pdf)
+
 [Another Perfect Game Solution](https://althofer.de/stahlhacke-lasker-morris-2003.pdf)
 
 ## The Implementation
