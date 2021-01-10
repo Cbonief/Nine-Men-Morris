@@ -1,8 +1,8 @@
-import numpy as np
 import copy
-from ninemenmorris import *
-import os
 import json
+import os
+
+from ninemenmorris import *
 
 with open(os.path.join("Assets", "primeiras_jogadas.json"), "r") as read_file:
     first_moves = json.load(read_file)
@@ -22,37 +22,42 @@ class Data:
         self.best_move = best_move
 
 
-transposition_table = {}
+transposition_table = [
+    {},
+    {}
+]
 
 
-def lookup_table(mill):
-    if hash(mill) in transposition_table.keys():
-        return transposition_table[hash(mill)]
+def lookup_table(player, mill):
+    if hash(mill) in transposition_table[Player.index[player]].keys():
+        return transposition_table[Player.index[player]][hash(mill)]
     else:
         return None
 
 
-def add_data_to_table(mill, new_data):
-    transposition_table[hash(mill)] = new_data
+def add_data_to_table(player, mill, new_data):
+    transposition_table[Player.index[player]][hash(mill)] = new_data
 
 
 def calculate_movement(mill, depth, player_color):
-    if mill.is_first_move[mill.indice(player_color)]:
-        if player_color == Player.BLACK:
-            move = create_move_from_hash(first_moves[mill.indice(Player.BLACK)][depth - 1][str(hash(mill))])
-        else:
-            move = create_move_from_hash(first_moves[mill.indice(Player.WHITE)][depth - 1])
-    else:
-        _, move = negamax(mill, depth, -np.inf, np.inf, player_color)
+    # if mill.is_first_move[mill.indice(player_color)]:
+    #     if player_color == Player.BLACK:
+    #         move = create_move_from_hash(first_moves[mill.indice(Player.BLACK)][depth - 1][str(hash(mill))])
+    #     else:
+    #         move = create_move_from_hash(first_moves[mill.indice(Player.WHITE)][depth - 1])
+    # else:
+    #
+    _, move = negamax(mill, depth, -np.inf, np.inf, player_color)
     return move
 
 
 def negamax(mill, depth, alpha, beta, player_color):
     alpha0 = alpha
 
-    data = lookup_table(mill)
+    data = lookup_table(player_color, mill)
     if data is not None and data.depth >= depth:
         if data.flag == Flag.EXACT:
+            print("Table used")
             return data.score, data.best_move
         elif data.flag == Flag.LOWERBOUND:
             alpha = max(alpha, data.score)
@@ -81,8 +86,11 @@ def negamax(mill, depth, alpha, beta, player_color):
     for move in valid_moves:
         child_mill = copy.deepcopy(mill)
         child_mill.execute_move(move)
-        result, _ = negamax(child_mill, depth - 1, -beta, -alpha, -player_color)
-        result = - result
+        if child_mill.active_player == player_color:
+            result, _ = negamax(child_mill, depth - 1, alpha, beta, child_mill.active_player)
+        else:
+            result, _ = negamax(child_mill, depth - 1, -beta, -alpha, -player_color)
+            result = - result
         if result > maximum:
             maximum = result
             chosen_move = move
@@ -97,6 +105,6 @@ def negamax(mill, depth, alpha, beta, player_color):
         new_data.flag = Flag.LOWERBOUND
     else:
         new_data.flag = Flag.EXACT
-    add_data_to_table(mill, new_data)
+    add_data_to_table(player_color, mill, new_data)
 
     return maximum, chosen_move

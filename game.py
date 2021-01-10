@@ -1,12 +1,10 @@
 # Bibliotecas externas
-import pygame                       # Biblioteca para a janela do jogo e evento de mouse.
-import pygame.freetype              # Sub biblioteca para a fonte.
-import os                           # Biblioteca para direcionamento do endereço dos arquivos.
-import numpy as np                  # Biblioteca para utilizar sqrt()
-import time
+import os  # Biblioteca para direcionamento do endereço dos arquivos.
+
+import pygame  # Biblioteca para a janela do jogo e evento de mouse.
+import pygame.freetype  # Sub biblioteca para a fonte.
 
 # Meu código
-import minimax
 import negamax
 from ninemenmorris import *
 from widgets import PushButton, Text, Border, Panel, Color, ToggleButton, Window
@@ -27,14 +25,12 @@ class Game:
 
         self.active_window = Window.MENU
         self.piece_being_held = False
-        self.held_piece = [-1, -1]
+        self.held_piece = -1
 
         # Faz o rescaling das posições da tela. O jogo foi originalmente feito para o tabuleiro ter 600x600.
         # Mas com a adição UI foi modificado para ter 500x500.
-        for i in range(0, 8):
-            for j in range(0, 8):
-                if positions[i][j]:
-                    positions[i][j] = [int(positions[i][j][0]*5/6+50), int(positions[i][j][1]*5/6+50)]
+        for position in range(0, 24):
+            tile_positions[position] = [int(tile_positions[position][0] * 5 / 6 + 50), int(tile_positions[position][1] * 5 / 6 + 50)]
 
         # Carregando as imagens do jogo.
         self.pieces_sprites = self.load_pieces_sprites()
@@ -172,9 +168,9 @@ class Game:
 
     def show_piece(self, position, player, piece_in_mill=False):
         if piece_in_mill:
-            self.window.blit(self.pieces_sprites[NineMenMorris.indice(player)]['Marcado'], [positions[position[0]][position[1]][0] - 24, positions[position[0]][position[1]][1] - 24])
+            self.window.blit(self.pieces_sprites[Player.index[player]]['Marcado'], [tile_positions[position][0] - 24, tile_positions[position][1] - 24])
         else:
-            self.window.blit(self.pieces_sprites[NineMenMorris.indice(player)]['Normal'], [positions[position[0]][position[1]][0] - 24, positions[position[0]][position[1]][1] - 24])
+            self.window.blit(self.pieces_sprites[Player.index[player]]['Normal'], [tile_positions[position][0] - 24, tile_positions[position][1] - 24])
 
     def show_piece_following_mouse(self, jogador):
         pos = pygame.mouse.get_pos()
@@ -196,8 +192,8 @@ class Game:
                 for button in self.window_manager[self.active_window].buttons.values():
                     button.detect_click(pygame.mouse.get_pos())
                 if not self.paused and self.active_window == Window.MATCH and self.window_manager[Window.MATCH].wait_complete:
-                    click_a_position, position_clicked = check_mouse_position(pygame.mouse.get_pos())
-                    if click_a_position and (not self.playing_vs_ai or self.mill.active_player == self.player_color):
+                    clicked_a_position, position_clicked = check_mouse_position(pygame.mouse.get_pos())
+                    if clicked_a_position and (not self.playing_vs_ai or self.mill.active_player == self.player_color):
                         if self.mill.piece_from_position(position_clicked) == self.mill.active_player and self.mill.stage == GameStage.MOVEMENT:
                             self.piece_being_held = True
                             self.held_piece = position_clicked
@@ -208,11 +204,10 @@ class Game:
 
             if event.type == pygame.MOUSEBUTTONUP:
                 dropped_over_a_position, position_dropped = check_mouse_position(pygame.mouse.get_pos())
-                if self.piece_being_held and dropped_over_a_position and self.mill.piece_from_position(
-                        position_dropped) == 0 and self.mill.stage == GameStage.MOVEMENT:
+                if self.piece_being_held and dropped_over_a_position and self.mill.piece_from_position(position_dropped) == 0 and self.mill.stage == GameStage.MOVEMENT:
                     self.move = Move(self.held_piece, MoveType.MOVE_PIECE, position_dropped)
                 self.piece_being_held = False
-                self.held_piece = [-1, -1]
+                self.held_piece = -1
 
     def change_active_window(self, new_window):
         self.active_window = new_window
@@ -254,10 +249,9 @@ class Game:
                 self.mill.execute_move(self.move)
 
         # Prepara o display das peças.
-        for i in range(0, 8):
-            for j in range(0, 8):
-                if board[i][j] and not (i == self.held_piece[0] and j == self.held_piece[1]):
-                    self.show_piece([i, j], board[i][j], self.mill.is_piece_in_mill([i, j]))
+        for position in range(0, 24):
+            if position != self.held_piece and self.mill.board[position] != 0:
+                self.show_piece(position, self.mill.board[position], self.mill.is_piece_in_mill(position))
         if self.piece_being_held:
             self.show_piece_following_mouse(self.mill.active_player)
 
@@ -295,12 +289,10 @@ class Game:
 
 
 def check_mouse_position(mouse_position):
-    for i in range(0, 8):
-        for j in range(0, 8):
-            if positions[i][j]:
-                if quadrature(mouse_position, positions[i][j]) <= 25**2:
-                    return True, [i, j]
-    return False, [-1, -1]
+    for position in range(0, 24):
+        if quadrature(mouse_position, tile_positions[position]) <= 25**2:
+            return True, position
+    return False, -1
 
 
 def quadrature(p, q):

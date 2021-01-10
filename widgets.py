@@ -1,6 +1,5 @@
 import pygame
 import pygame.freetype
-import pygame
 
 pygame.freetype.init()
 
@@ -240,6 +239,7 @@ class Panel:
 
     def set_text(self, new_text):
         self.text.txt = new_text
+
 
 class Window:
     MENU = 0
