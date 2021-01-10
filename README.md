@@ -74,7 +74,58 @@ You can read more about the game at:
 
 ## The Implementation
 
+All implementation was built in Python 3.7 and the libraries used so far are:
+- Numpy: used for some calculations.
+- Pygame: used to create the game display and handle input events.
+- OS: used to get easy acess to files.
+
+The project started with the base game with no interface whatsoever, and that's where I'll start explaning it.
+
 ### The Game
+
+The first thing I did was create a Nine Morris game Class to store the board, active player and the mills, and have functions to act on the board and read information from it.
+
+##### The players
+
+The white player will be considered as being equal to 1 and the black player as -1. This will be stored in a player class. The numbers were choosen because it´s easy to chang the active player with``active_player = -active_player``.
+
+```python
+class Player:
+	WHITE = 1
+	BLACK = -1
+```
+
+#### The board
+
+The 24 positions of the board will be stored in a **np.array** of size 24, and will be labeled as follows.
+
+![Labeled Board](https://imgur.com/nXBDbyN.png)
+
+Doing this means will have to know all possible mill configurations. This I have already done, and wrote in the file [Possible Mills](Assets/possible_mills.txt).
+
+
+#### The moves
+
+There are three types of possible moves, either you place a piece, move a piece or remove a piece. With this in mind, we´ll make the class `MoveType` 
+
+```python
+class MoveType:
+	PLACE_PIECE = 1
+	MOVE_PIECE = 2
+	REMOVE_PIECE = 3
+```
+
+We´ll also have a class for the move itself, storing the position where the move will act upon, the type of move and, if it´s a piece movement, the final position of the piece.
+
+```python
+class Move:
+    def __init__(self, position, move_type, final_position=None):
+        self.move_type = move_type
+        self.position = position
+        self.final_position = final_position
+```
+
+This class will also have a method to verify if the move is valid, a method to pretty print the move, and a method to hash it (more about this later).
 
 
 ### The AI
