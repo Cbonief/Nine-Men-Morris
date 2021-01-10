@@ -1,4 +1,4 @@
-*Read this in other languages: [Português-BR](readme_pt-BR.md)
+*Read this in portguese: [Português-BR](README-pt_BR.md)
 
 
 # About this project
