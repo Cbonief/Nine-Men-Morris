@@ -43,7 +43,7 @@ It is in phase two that the players now move the pieces they have previouly plac
 
 Again, if a mill is formed, the player can remove a piece from the opponent.
 
-## Phase Three
+### Phase Three
 
 If a player is left with only three pieces in phase two, it is said that the player is flying, and begins phase three, where the losing player can now move pieces to any empty tile, and not just adjacent ones. This gives this player an advantage, so as to not make the end game boring.
 
