@@ -85,4 +85,11 @@ You can read more about the game at:
 
 #### Pygame
 
+
+## To Do
+- Add in game time.
+- Add minimal (plus random number) time for AI to play.
+- Ability to go back to the main menu once the game has starded.
+
+
 #### Widgets
