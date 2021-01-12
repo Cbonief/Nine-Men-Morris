@@ -46,7 +46,7 @@ def calculate_movement(mill, depth, player_color):
     #     else:
     #         move = create_move_from_hash(first_moves[mill.indice(Player.WHITE)][depth - 1])
     # else:
-    #
+
     _, move = negamax(mill, depth, -np.inf, np.inf, player_color)
     return move
 
@@ -57,7 +57,6 @@ def negamax(mill, depth, alpha, beta, player_color):
     data = lookup_table(player_color, mill)
     if data is not None and data.depth >= depth:
         if data.flag == Flag.EXACT:
-            print("Table used")
             return data.score, data.best_move
         elif data.flag == Flag.LOWERBOUND:
             alpha = max(alpha, data.score)
@@ -87,7 +86,7 @@ def negamax(mill, depth, alpha, beta, player_color):
         child_mill = copy.deepcopy(mill)
         child_mill.execute_move(move)
         if child_mill.active_player == player_color:
-            result, _ = negamax(child_mill, depth - 1, alpha, beta, child_mill.active_player)
+            result, _ = negamax(child_mill, depth, alpha, beta, child_mill.active_player)
         else:
             result, _ = negamax(child_mill, depth - 1, -beta, -alpha, -player_color)
             result = - result

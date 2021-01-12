@@ -126,6 +126,7 @@ class Game:
 
         game_window_panels = {
             'Move': Panel([self.width / 2 - 100, 10], [200, 30], grey_panel, Border(0, Color.BLACK), Text('Vez do Branco', 18, Color.BLACK))
+
         }
 
         config_window_panels = {
