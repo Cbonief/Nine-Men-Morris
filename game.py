@@ -1,5 +1,6 @@
 # Bibliotecas externas
 import os  # Biblioteca para direcionamento do endereço dos arquivos.
+import threading
 
 import pygame  # Biblioteca para a janela do jogo e evento de mouse.
 import pygame.freetype  # Sub biblioteca para a fonte.
@@ -150,6 +151,9 @@ class Game:
         self.playing_vs_ai = None
         self.player_color = Player.WHITE
 
+        simulation_thread = threading.Thread(target=self.ai_calculation, daemon=True)
+        simulation_thread.start()
+
     def run(self):
         timer = pygame.time.Clock()
         while self.running:
@@ -227,6 +231,11 @@ class Game:
             self.ai_depth_level = self.ai_depth_level + dif
             self.window_manager[Window.CONFIG].panels['AiLevel'].set_text(str(self.ai_depth_level))
 
+    def ai_calculation(self):
+        while True:
+            if self.mill.active_player == -self.player_color and self.playing_vs_ai:
+                self.move = negamax.calculate_movement(self.mill, self.ai_depth_level, -self.player_color)
+
     def match(self):
         self.window.blit(self.background_sprite, [0, 0])
         pygame.draw.rect(self.window, (0, 0, 0), (43, 43, 514, 514))
@@ -242,9 +251,6 @@ class Game:
 
         # Caso seja a vez da AI, calcula sua jogada.
         if not self.mill.game_over:
-            if self.mill.active_player == -self.player_color and self.playing_vs_ai:
-                self.move = negamax.calculate_movement(self.mill, self.ai_depth_level, -self.player_color)
-
             # Executa a jogada, seja da AI ou do jogador.
             if self.move and self.move.is_valid(self.mill):
                 self.mill.execute_move(self.move)

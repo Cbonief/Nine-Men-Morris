@@ -29,9 +29,9 @@ transposition_table = [
 
 
 def lookup_table(player, mill):
-    if hash(mill) in transposition_table[Player.index[player]].keys():
+    try:
         return transposition_table[Player.index[player]][hash(mill)]
-    else:
+    except KeyError:
         return None
 
 
