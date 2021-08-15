@@ -143,7 +143,9 @@ My explanation of it is not maximized, so I suggest you watch Sebastian Lague's 
 on it. [Video](https://www.youtube.com/watch?v=l-hh51ncgDI&pp=ugMICgJwdBABGAE%3D)
 
 My implementation uses _alpha beta_ pruning and transpositions tables, which speed up
-the search when the depth is high.
+the search when the depth is high. This is the reason why 
+the moves and the board state need a hashing fuction.
+
 
 ### UI
 
