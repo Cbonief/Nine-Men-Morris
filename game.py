@@ -232,9 +232,10 @@ class Game:
             self.window_manager[Window.CONFIG].panels['AiLevel'].set_text(str(self.ai_depth_level))
 
     def ai_calculation(self):
-        while True:
-            if self.mill.active_player == -self.player_color and self.playing_vs_ai:
-                self.move = negamax.calculate_movement(self.mill, self.ai_depth_level, -self.player_color)
+        x = 2
+        # while True:
+        #     if self.mill.active_player == -self.player_color and self.playing_vs_ai:
+        #         self.move = negamax.calculate_movement(self.mill, self.ai_depth_level, -self.player_color)
 
     def match(self):
         self.window.blit(self.background_sprite, [0, 0])
@@ -251,6 +252,9 @@ class Game:
 
         # Caso seja a vez da AI, calcula sua jogada.
         if not self.mill.game_over:
+            if self.mill.active_player == -self.player_color and self.playing_vs_ai:
+                self.move = negamax.calculate_movement(self.mill, self.ai_depth_level, -self.player_color)
+
             # Executa a jogada, seja da AI ou do jogador.
             if self.move and self.move.is_valid(self.mill):
                 self.mill.execute_move(self.move)

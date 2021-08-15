@@ -11,7 +11,6 @@ class MoveType:
     REMOVE_PIECE = 3
 
 
-
 class Move:
     def __init__(self, position, move_type, final_position=None):
         self.move_type = move_type

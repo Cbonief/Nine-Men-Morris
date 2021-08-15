@@ -40,19 +40,14 @@ def add_data_to_table(player, mill, new_data):
 
 
 def calculate_movement(mill, depth, player_color):
-    # if mill.is_first_move[mill.indice(player_color)]:
-    #     if player_color == Player.BLACK:
-    #         move = create_move_from_hash(first_moves[mill.indice(Player.BLACK)][depth - 1][str(hash(mill))])
-    #     else:
-    #         move = create_move_from_hash(first_moves[mill.indice(Player.WHITE)][depth - 1])
-    # else:
-
     _, move = negamax(mill, depth, -np.inf, np.inf, player_color)
     return move
 
 
-def negamax(mill, depth, alpha, beta, player_color):
+def negamax(mill, depth, alpha, beta, player_color, called=0):
     alpha0 = alpha
+    called += 1
+    print(called)
 
     data = lookup_table(player_color, mill)
     if data is not None and data.depth >= depth:
@@ -73,8 +68,7 @@ def negamax(mill, depth, alpha, beta, player_color):
             return -100, None
 
     if depth == 0:
-        return mill.number_of_pieces[mill.indice(player_color)] - mill.number_of_pieces[
-            mill.indice((-1) * player_color)], None
+        return mill.number_of_pieces[mill.indice(player_color)] - mill.number_of_pieces[mill.indice((-1) * player_color)], None
 
     maximum = -np.inf
     valid_moves = mill.get_all_valid_moves(player_color)
@@ -86,9 +80,9 @@ def negamax(mill, depth, alpha, beta, player_color):
         child_mill = copy.deepcopy(mill)
         child_mill.execute_move(move)
         if child_mill.active_player == player_color:
-            result, _ = negamax(child_mill, depth, alpha, beta, child_mill.active_player)
+            result, _ = negamax(child_mill, depth, alpha, beta, child_mill.active_player, called)
         else:
-            result, _ = negamax(child_mill, depth - 1, -beta, -alpha, -player_color)
+            result, _ = negamax(child_mill, depth - 1, -beta, -alpha, -player_color, called)
             result = - result
         if result > maximum:
             maximum = result
