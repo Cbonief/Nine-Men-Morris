@@ -14,6 +14,8 @@ from widgets import PushButton, Text, Border, Panel, Color, ToggleButton, Window
 # Classe do manager do Jogo.
 class Game:
     def __init__(self, window):
+        self.timer = 0
+
         self.width = window.get_width()
         self.height = window.get_height()
         self.window = window
@@ -189,9 +191,15 @@ class Game:
 
     def event_handler(self):
         self.move = None
+        # Update timer
+        if self.active_window == Window.MATCH:
+            self.timer += pygame.time.get_ticks() - self.prev_ticks
+            self.prev_ticks = pygame.time.get_ticks()
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 self.running = False
+
+
 
             if event.type == pygame.MOUSEBUTTONDOWN:
                 for button in self.window_manager[self.active_window].buttons.values():
@@ -220,6 +228,8 @@ class Game:
     def start_match(self, is_vs_ai=False):
         self.playing_vs_ai = is_vs_ai
         self.active_window = Window.MATCH
+        self.timer = 0
+        self.prev_ticks = pygame.time.get_ticks()
         if self.playing_vs_ai:
             if self.window_manager[Window.CONFIG].buttons['Color'].is_pressed:
                 self.player_color = Player.BLACK
@@ -242,6 +252,10 @@ class Game:
         pygame.draw.rect(self.window, (0, 0, 0), (43, 43, 514, 514))
         pygame.draw.rect(self.window, (255, 255, 255), (44, 44, 512, 512))
         self.window.blit(self.board_sprite, [50, 50])
+
+        timer_text = f"Time: {self.timer // 1000}s"
+        timer_surface, _ = self.font.render(timer_text, Color.BLACK)
+        self.window.blit(timer_surface, (10, 10))
 
         if self.mill.game_over:
             self.window_manager[Window.MATCH].panels['Move'].set_text(self.text_game_over[self.mill.indice(self.mill.winner)])

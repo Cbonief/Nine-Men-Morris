@@ -47,7 +47,7 @@ def calculate_movement(mill, depth, player_color):
 def negamax(mill, depth, alpha, beta, player_color, called=0):
     alpha0 = alpha
     called += 1
-    print(called)
+    # print(called)
 
     data = lookup_table(player_color, mill)
     if data is not None and data.depth >= depth:
